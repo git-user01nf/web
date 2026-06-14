@@ -187,4 +187,4 @@ def main(page: ft.Page):
     )
     page.update()
 
-ft.run(main, view=ft.AppView.WEB_BROWSER, assets_dir="assets")
+ft.run(main, view=ft.AppView.WEB_BROWSER, assets_dir="assets", host="0.0.0.0", port=8000)
