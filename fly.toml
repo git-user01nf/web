@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for mathewportfolio2026 on 2026-06-14T19:04:13Z
+# fly.toml app configuration file generated for fulayi on 2026-06-14T19:35:49Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'mathewportfolio2026'
+app = 'fulayi'
 primary_region = 'ams'
 
 [build]
