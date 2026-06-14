@@ -1,6 +1,7 @@
 app = "mathewsportfolio2026"
 
 [build]
+  command = "python server.py"
 
 [env]
   PORT = "8000"
