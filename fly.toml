@@ -1,18 +1,21 @@
-app = "mathewsportfolio2026"
+import flet as ft
+import sys
+import os
 
-[build]
+# Add current directory to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-[env]
-  PORT = "8000"
+print("Current directory:", os.getcwd())
+print("Files in directory:", os.listdir())
 
-[http_service]
-  internal_port = 8000
-  force_https = true
-  auto_stop_machines = false
-  auto_start_machines = true
-  min_machines_running = 1
+try:
+    from main import main
+    print("Successfully imported main")
+except Exception as e:
+    print(f"Import error: {e}")
+    def main(page: ft.Page):
+        page.add(ft.Text(f"Error: {e}", size=20, color="red"))
 
-[[vm]]
-  memory = "256mb"
-  cpu_kind = "shared"
-  cpus = 1
+if __name__ == "__main__":
+    print("Starting server on port 8080...")
+    ft.app(target=main, host="0.0.0.0", port=8080)
