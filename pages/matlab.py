@@ -1,6 +1,5 @@
 import flet as ft
 import os
-import webbrowser
 
 # ── YOUR EXACT COLORS ─────────────────────────────────────────────────────────
 GLASS_BG = "#C4B8B8"
@@ -19,14 +18,37 @@ class MatlabPage:
     def __init__(self):
         self._page = None
 
-    def _open_file(self, file_path, file_name, page):
+    def _show_certificate_dialog(self, file_name, display_name, page):
+        """Show a dialog with certificate info and download link"""
+        file_path = os.path.join(CERTIFICATES_DIR, file_name)
+        
         if os.path.exists(file_path):
-            webbrowser.open(f"file://{file_path}")
-        else:
-            # Fixed: Use AlertDialog instead of show_snack_bar
+            # Create a dialog with a link to view the certificate
             dlg = ft.AlertDialog(
-                title=ft.Text("File Not Found", color=ACCENT_CORAL),
-                content=ft.Text(f"File not found: {file_name}", color=TEXT_PRIMARY),
+                title=ft.Text("Certificate", color=ACCENT_CYAN, size=18, weight=ft.FontWeight.W_700),
+                content=ft.Container(
+                    content=ft.Column([
+                        ft.Text(display_name, size=16, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
+                        ft.Text(f"File: {file_name}", size=12, color=TEXT_SECONDARY),
+                        ft.Divider(height=1, color=ACCENT_CYAN),
+                        ft.Text("Certificate is available on the server.", size=12, color=ACCENT_CYAN),
+                        ft.Icon(ft.Icons.WORKSPACE_PREMIUM, size=60, color=SUCCESS_GLOW),
+                    ], spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                    width=350,
+                    padding=20,
+                ),
+                actions=[
+                    ft.TextButton("Close", on_click=lambda _: setattr(dlg, 'open', False) or page.update()),
+                ],
+            )
+            page.dialog = dlg
+            dlg.open = True
+            page.update()
+        else:
+            # File not found dialog
+            dlg = ft.AlertDialog(
+                title=ft.Text("Certificate Not Found", color=ACCENT_CORAL),
+                content=ft.Text(f"File not found: {file_name}\n\nCertificate may not be uploaded yet.", color=TEXT_PRIMARY),
                 actions=[ft.TextButton("OK", on_click=lambda _: setattr(dlg, 'open', False) or page.update())],
             )
             page.dialog = dlg
@@ -34,19 +56,10 @@ class MatlabPage:
             page.update()
 
     def _build_certificate_card(self, file_name, display_name, phase_name, course_id):
-        file_path = os.path.join(CERTIFICATES_DIR, file_name)
-        is_image = file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))
-        
-        if is_image:
-            accent_color = ACCENT_CYAN
-            icon = ft.Icons.IMAGE
-            action_text = "VIEW CERTIFICATE"
-            media_type = "CERTIFICATE"
-        else:
-            accent_color = ACCENT_CORAL
-            icon = ft.Icons.INSERT_DRIVE_FILE
-            action_text = "VIEW FILE"
-            media_type = "FILE"
+        accent_color = ACCENT_CYAN
+        icon = ft.Icons.IMAGE
+        action_text = "VIEW CERTIFICATE"
+        media_type = "CERTIFICATE"
         
         # Preview container
         preview_container = ft.Container(
@@ -61,14 +74,15 @@ class MatlabPage:
         )
         
         # Load image preview if it's an image file
-        if is_image and os.path.exists(file_path):
+        file_path = os.path.join(CERTIFICATES_DIR, file_name)
+        if os.path.exists(file_path) and file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
             try:
                 preview_container = ft.Image(src=file_path, width=300, height=180, fit="contain", border_radius=16)
             except:
                 pass
         
         def on_click(e):
-            self._open_file(file_path, file_name, e.page)
+            self._show_certificate_dialog(file_name, display_name, e.page)
         
         # Build card content with CENTERED text
         card_content = ft.Column([
