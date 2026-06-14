@@ -1,11 +1,18 @@
 import flet as ft
 import os
+<<<<<<< HEAD
 import webbrowser
+=======
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
 
 # ── YOUR EXACT COLORS ─────────────────────────────────────────────────────────
 GLASS_BG = "#C4B8B8"
 GLASS_BLUR = ft.Blur(96, 96)
+<<<<<<< HEAD
 TEXT_PRIMARY = "#832900"
+=======
+TEXT_PRIMARY = "#69280A"
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
 TEXT_SECONDARY = "#533535"
 ACCENT_CYAN = "#3d3d3b"
 ACCENT_CORAL = "#350707"
@@ -19,6 +26,7 @@ class MatlabPage:
     def __init__(self):
         self._page = None
 
+<<<<<<< HEAD
     def _open_file(self, file_path, file_name, page):
         if os.path.exists(file_path):
             webbrowser.open(f"file://{file_path}")
@@ -39,6 +47,50 @@ class MatlabPage:
             icon = ft.Icons.INSERT_DRIVE_FILE
             action_text = "VIEW FILE"
             media_type = "FILE"
+=======
+    def _show_certificate_dialog(self, file_name, display_name, page):
+        """Show a dialog with certificate info and download link"""
+        file_path = os.path.join(CERTIFICATES_DIR, file_name)
+        
+        if os.path.exists(file_path):
+            # Create a dialog with a link to view the certificate
+            dlg = ft.AlertDialog(
+                title=ft.Text("Certificate", color=ACCENT_CYAN, size=18, weight=ft.FontWeight.W_700),
+                content=ft.Container(
+                    content=ft.Column([
+                        ft.Text(display_name, size=16, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
+                        ft.Text(f"File: {file_name}", size=12, color=TEXT_SECONDARY),
+                        ft.Divider(height=1, color=ACCENT_CYAN),
+                        ft.Text("Certificate is available on the server.", size=12, color=ACCENT_CYAN),
+                        ft.Icon(ft.Icons.WORKSPACE_PREMIUM, size=60, color=SUCCESS_GLOW),
+                    ], spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                    width=350,
+                    padding=20,
+                ),
+                actions=[
+                    ft.TextButton("Close", on_click=lambda _: setattr(dlg, 'open', False) or page.update()),
+                ],
+            )
+            page.dialog = dlg
+            dlg.open = True
+            page.update()
+        else:
+            # File not found dialog
+            dlg = ft.AlertDialog(
+                title=ft.Text("Certificate Not Found", color=ACCENT_CORAL),
+                content=ft.Text(f"File not found: {file_name}\n\nCertificate may not be uploaded yet.", color=TEXT_PRIMARY),
+                actions=[ft.TextButton("OK", on_click=lambda _: setattr(dlg, 'open', False) or page.update())],
+            )
+            page.dialog = dlg
+            dlg.open = True
+            page.update()
+
+    def _build_certificate_card(self, file_name, display_name, phase_name, course_id):
+        accent_color = ACCENT_CYAN
+        icon = ft.Icons.IMAGE
+        action_text = "VIEW CERTIFICATE"
+        media_type = "CERTIFICATE"
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
         
         # Preview container
         preview_container = ft.Container(
@@ -53,14 +105,23 @@ class MatlabPage:
         )
         
         # Load image preview if it's an image file
+<<<<<<< HEAD
         if is_image and os.path.exists(file_path):
+=======
+        file_path = os.path.join(CERTIFICATES_DIR, file_name)
+        if os.path.exists(file_path) and file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
             try:
                 preview_container = ft.Image(src=file_path, width=300, height=180, fit="contain", border_radius=16)
             except:
                 pass
         
         def on_click(e):
+<<<<<<< HEAD
             self._open_file(file_path, file_name, e.page)
+=======
+            self._show_certificate_dialog(file_name, display_name, e.page)
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
         
         # Build card content with CENTERED text
         card_content = ft.Column([
@@ -146,4 +207,8 @@ class MatlabPage:
             spacing=20,
             expand=True,
             scroll=ft.ScrollMode.AUTO,
+<<<<<<< HEAD
         )
+=======
+        )
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430

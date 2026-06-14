@@ -23,22 +23,37 @@ SUCCESS_GLOW = "#00ffaa"
 ACTIVE_GLOW = "#925000"
 
 def main(page: ft.Page):
+<<<<<<< HEAD
     page.title = "NeoCodex Portfolio 2026"
+=======
+    page.title = "NeoCodex Portfolio 2126"
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
     page.theme_mode = ft.ThemeMode.DARK
     page.padding = 0
     page.bgcolor = "transparent"
     page.scroll = ft.ScrollMode.AUTO
 
+<<<<<<< HEAD
     # Static gradient (no animation thread for web compatibility)
     bg_container = ft.Container(expand=True, gradient=BG_GRADIENT)
 
     # Pages
+=======
+    # ── Static gradient (no animation thread) ────────────────────────────────
+    bg_container = ft.Container(expand=True, gradient=BG_GRADIENT)
+
+    # ── Pages ──────────────────────────────────────────────────────────────────
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
     timeline_page = TimelinePage()
     matlab_page = MatlabPage()
     blog_page = BlogPage()
     github_page = GithubPage()
 
+<<<<<<< HEAD
     # Content container
+=======
+    # ── Content container ──────────────────────────────────────────────────────
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
     content_container = ft.Container(
         expand=True,
         opacity=1,
@@ -52,7 +67,11 @@ def main(page: ft.Page):
         border=ft.Border.all(1, ft.Colors.with_opacity(0.3, ACCENT_CYAN)),
     )
 
+<<<<<<< HEAD
     # Navigation
+=======
+    # ── Navigation ────────────────────────────────────────────────────────────
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
     current_index = {"v": 0}
     nav_buttons = []
     nav_labels = ["TIMELINE", "MATRIX LAB", "BLOG", "GITHUB"]
@@ -87,7 +106,11 @@ def main(page: ft.Page):
         if idx == 0:
             content_container.content = timeline_page.build()
         elif idx == 1:
+<<<<<<< HEAD
             content_container.content = matlab_page.build(page)
+=======
+            content_container.content = matlab_page.build()
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
         elif idx == 2:
             content_container.content = blog_page.build(page)
         elif idx == 3:
@@ -123,6 +146,7 @@ def main(page: ft.Page):
         blur=ft.Blur(6, 6),
     )
 
+<<<<<<< HEAD
     # User Info (Top-Right Corner)
     user_info = ft.Container(
         content=ft.Column([
@@ -137,6 +161,22 @@ def main(page: ft.Page):
     )
     
     # Hero header with user info on the right
+=======
+    # ── User Info (Top-Right Corner) ──────────────────────────────────────────
+    user_info = ft.Container(
+        content=ft.Column([
+            ft.Text("FULAYI MATHEWS WAQAS", size=19, weight=ft.FontWeight.W_700, color=ACCENT_CYAN, text_align=ft.TextAlign.RIGHT),
+            ft.Text("STUDENT NO: 224122754", size=16, color=TEXT_SECONDARY, text_align=ft.TextAlign.RIGHT),
+        ], spacing=4, horizontal_alignment=ft.CrossAxisAlignment.END),
+        bgcolor=GLASS_BG,
+        padding=ft.Padding(24, 12, 24, 12),
+        border_radius=25,
+        border=ft.Border.all(1.5, ft.Colors.with_opacity(0.5, ACCENT_CYAN)),
+        margin=ft.Margin(0, 20, 30, 0),
+    )
+    
+    # ── Hero header with user info on the right ────────────────────────────────
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
     centered_content = ft.Column(
         controls=[
             ft.Row([
@@ -187,6 +227,10 @@ def main(page: ft.Page):
     )
     page.update()
 
+<<<<<<< HEAD
 # This is the critical line for Fly.io - must bind to 0.0.0.0
 if __name__ == "__main__":
     ft.app(target=main, host="0.0.0.0", port=8000)
+=======
+ft.run(main, view=ft.AppView.WEB_BROWSER, assets_dir="assets", host="0.0.0.0", port=8000)
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430

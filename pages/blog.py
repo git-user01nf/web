@@ -24,18 +24,51 @@ CARD_BORDER = "#2a2a4a"
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets")
 SCREENSHOTS_DIR = os.path.join(ASSETS_DIR, "screenshots")
 
+<<<<<<< HEAD
 # Google Drive link for video (NEW LINK)
+=======
+# Google Drive link for video
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
 GOOGLE_DRIVE_LINK = "https://drive.google.com/file/d/1w2MyQiLoqyGslYFWv9syljxEHR0P3oC7/view?usp=drivesdk"
 
 class BlogPage:
     def __init__(self):
         self._page = None
 
+<<<<<<< HEAD
     def _open_file(self, file_path, file_name, page):
         if os.path.exists(file_path):
             webbrowser.open(f"file://{file_path}")
         else:
             # Use AlertDialog instead of snackbar
+=======
+    def _show_image_dialog(self, file_name, display_name, page):
+        """Show a dialog with image info"""
+        file_path = os.path.join(SCREENSHOTS_DIR, file_name)
+        
+        if os.path.exists(file_path):
+            dlg = ft.AlertDialog(
+                title=ft.Text("Screenshot", color=ACCENT_PRIMARY, size=18, weight=ft.FontWeight.W_700),
+                content=ft.Container(
+                    content=ft.Column([
+                        ft.Text(display_name, size=16, weight=ft.FontWeight.W_600, color=TEXT_PRIMARY),
+                        ft.Text(f"File: {file_name}", size=12, color=TEXT_SECONDARY),
+                        ft.Divider(height=1, color=ACCENT_PRIMARY),
+                        ft.Text("Image is available on the server.", size=12, color=ACCENT_PRIMARY),
+                        ft.Icon(ft.Icons.IMAGE, size=60, color=ACCENT_PRIMARY),
+                    ], spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                    width=350,
+                    padding=20,
+                ),
+                actions=[
+                    ft.TextButton("Close", on_click=lambda _: setattr(dlg, 'open', False) or page.update()),
+                ],
+            )
+            page.dialog = dlg
+            dlg.open = True
+            page.update()
+        else:
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
             dlg = ft.AlertDialog(
                 title=ft.Text("File Not Found", color=ACCENT_DANGER),
                 content=ft.Text(f"File not found: {file_name}", color=TEXT_SECONDARY),
@@ -49,7 +82,10 @@ class BlogPage:
         webbrowser.open(GOOGLE_DRIVE_LINK)
 
     def _build_screenshot_card(self, file_name, display_name):
+<<<<<<< HEAD
         file_path = os.path.join(SCREENSHOTS_DIR, file_name)
+=======
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
         is_video = file_name.lower().endswith(('.mp4', '.mov', '.avi', '.mkv', '.webm'))
         
         if is_video:
@@ -75,7 +111,12 @@ class BlogPage:
             border_radius=16,
         )
         
+<<<<<<< HEAD
         # Load image preview if it's an image file
+=======
+        # Load image preview if it's an image file and exists
+        file_path = os.path.join(SCREENSHOTS_DIR, file_name)
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
         if not is_video and os.path.exists(file_path) and file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
             try:
                 preview_container = ft.Image(src=file_path, width=300, height=180, fit="contain", border_radius=16)
@@ -83,11 +124,18 @@ class BlogPage:
                 pass
         
         def on_click(e):
+<<<<<<< HEAD
             # For video files, redirect to Google Drive link
             if is_video:
                 self._open_drive_link(e.page)
             else:
                 self._open_file(file_path, file_name, e.page)
+=======
+            if is_video:
+                self._open_drive_link(e.page)
+            else:
+                self._show_image_dialog(file_name, display_name, e.page)
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
         
         # Build card content with CENTERED text
         card_content = ft.Column([
@@ -104,7 +152,11 @@ class BlogPage:
             ),
         ], spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
         
+<<<<<<< HEAD
         # For video cards, add a clear "Follow link to watch video" button
+=======
+        # Add Google Drive link right below video card with new label
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
         if is_video:
             card_content.controls.append(
                 ft.Container(
@@ -177,7 +229,11 @@ class BlogPage:
         screenshots_grid = ft.GridView(expand=True, max_extent=340, child_aspect_ratio=1.1, spacing=20, run_spacing=20)
         
         screenshot_files = [
+<<<<<<< HEAD
             ("portfolio_video.mp4", "🎬 Project Demo Video"),
+=======
+            ("Click to watch video.mp4", "🎬 Project Demo Video"),
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
             ("commits history 2.png", "📊 GitHub Commits - Part 2"),
             ("commits history.png", "📈 GitHub Commits History"),
             ("commits.png", "💾 Commit Records"),
@@ -266,4 +322,8 @@ class BlogPage:
             expand=True,
             scroll=ft.ScrollMode.AUTO,
         )
+<<<<<<< HEAD
         
+=======
+    
+>>>>>>> 3b19df9961f2da191de65680b060db66b053f430
