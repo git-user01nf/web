@@ -5,8 +5,9 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy all application files
 COPY . .
 
-EXPOSE 8080
+EXPOSE 8000
 
 CMD ["python", "main.py"]
