@@ -4,7 +4,6 @@ from pages.matlab import MatlabPage
 from pages.blog import BlogPage
 from pages.github import GithubPage
 import time
-import threading
 
 # ── DARKER COLOUR SCHEME (deep space, no white cast) ─────────────────────────
 BG_GRADIENT = ft.RadialGradient(
@@ -13,7 +12,7 @@ BG_GRADIENT = ft.RadialGradient(
     colors=["#050a15", "#0a0f1a", "#0d1220"],
     stops=[0.0, 0.5, 1.0],
 )
-GLASS_BG = "#D2D6E7"          # very dark blue‑black glass
+GLASS_BG = "#D2D6E7"
 GLASS_BLUR = ft.Blur(95, 95)
 ACCENT_CYAN = "#00e5ff"
 ACCENT_CORAL = "#ff6b6b"
@@ -24,44 +23,22 @@ SUCCESS_GLOW = "#00ffaa"
 ACTIVE_GLOW = "#925000"
 
 def main(page: ft.Page):
-    page.title = "NeoCodex Portfolio 2126"
+    page.title = "NeoCodex Portfolio 2026"
     page.theme_mode = ft.ThemeMode.DARK
     page.padding = 0
     page.bgcolor = "transparent"
     page.scroll = ft.ScrollMode.AUTO
 
-    # ── Animated background (very dark) ────────────────────────────────────────
+    # Static gradient (no animation thread for web compatibility)
     bg_container = ft.Container(expand=True, gradient=BG_GRADIENT)
-    
-    def animate_background():
-        colors_palette = [
-            ["#050a15", "#0a0f1a", "#0d1220"],
-            ["#0a0f1a", "#0d1220", "#050a15"],
-            ["#0d1220", "#050a15", "#0a0f1a"],
-        ]
-        idx = 0
-        while True:
-            time.sleep(12)
-            try:
-                bg_container.gradient = ft.RadialGradient(
-                    center=ft.Alignment(0.5, 0.5),
-                    radius=0.8,
-                    colors=colors_palette[idx % len(colors_palette)],
-                    stops=[0.0, 0.5, 1.0],
-                )
-                page.update()
-                idx += 1
-            except:
-                pass
-    threading.Thread(target=animate_background, daemon=True).start()
 
-    # ── Pages ──────────────────────────────────────────────────────────────────
+    # Pages
     timeline_page = TimelinePage()
     matlab_page = MatlabPage()
     blog_page = BlogPage()
     github_page = GithubPage()
 
-    # ── Content container (much darker glass) ──────────────────────────────────
+    # Content container
     content_container = ft.Container(
         expand=True,
         opacity=1,
@@ -75,7 +52,7 @@ def main(page: ft.Page):
         border=ft.Border.all(1, ft.Colors.with_opacity(0.3, ACCENT_CYAN)),
     )
 
-    # ── Navigation ────────────────────────────────────────────────────────────
+    # Navigation
     current_index = {"v": 0}
     nav_buttons = []
     nav_labels = ["TIMELINE", "MATRIX LAB", "BLOG", "GITHUB"]
@@ -110,7 +87,7 @@ def main(page: ft.Page):
         if idx == 0:
             content_container.content = timeline_page.build()
         elif idx == 1:
-            content_container.content = matlab_page.build()
+            content_container.content = matlab_page.build(page)
         elif idx == 2:
             content_container.content = blog_page.build(page)
         elif idx == 3:
@@ -146,21 +123,20 @@ def main(page: ft.Page):
         blur=ft.Blur(6, 6),
     )
 
-    # ── User Info (Top-Right Corner) - 60% LARGER ──────────────────────────────
+    # User Info (Top-Right Corner)
     user_info = ft.Container(
         content=ft.Column([
-            ft.Text("FULAYI MATHEWS WAQAS", size=19, weight=ft.FontWeight.W_700, color=ACCENT_CYAN, text_align=ft.TextAlign.RIGHT),
-            ft.Text("STUDENT NO: 224122754", size=16, color=TEXT_SECONDARY, text_align=ft.TextAlign.RIGHT),
-        ], spacing=4, horizontal_alignment=ft.CrossAxisAlignment.END),
+            ft.Text("FULAYI MATHEWS WAQAS", size=16, weight=ft.FontWeight.W_700, color=ACCENT_CYAN, text_align=ft.TextAlign.RIGHT),
+            ft.Text("STUDENT NO: 224122754", size=12, color=TEXT_SECONDARY, text_align=ft.TextAlign.RIGHT),
+        ], spacing=2, horizontal_alignment=ft.CrossAxisAlignment.END),
         bgcolor=GLASS_BG,
-        padding=ft.Padding(24, 12, 24, 12),
-        border_radius=25,
-        border=ft.Border.all(1.5, ft.Colors.with_opacity(0.5, ACCENT_CYAN)),
+        padding=ft.Padding(15, 8, 15, 8),
+        border_radius=20,
+        border=ft.Border.all(1, ft.Colors.with_opacity(0.5, ACCENT_CYAN)),
         margin=ft.Margin(0, 20, 30, 0),
-        shadow=ft.BoxShadow(blur_radius=15, color=ACCENT_CYAN + "44"),
     )
     
-    # ── Hero header with user info on the right ────────────────────────────────
+    # Hero header with user info on the right
     centered_content = ft.Column(
         controls=[
             ft.Row([
@@ -172,7 +148,7 @@ def main(page: ft.Page):
                     border_radius=12,
                 ),
             ], alignment=ft.MainAxisAlignment.CENTER, spacing=12),
-            ft.Text("PORTFOLIO 2126", size=56, weight=ft.FontWeight.W_900, color=TEXT_PRIMARY),
+            ft.Text("PORTFOLIO 2026", size=56, weight=ft.FontWeight.W_900, color=TEXT_PRIMARY),
             ft.Text("individual contribution system · civil engineering · fix‑flow", size=14, color=TEXT_SECONDARY),
             ft.Container(width=80, height=2, bgcolor=ACCENT_CYAN, margin=ft.Margin(0, 12, 0, 0)),
         ],
@@ -211,4 +187,6 @@ def main(page: ft.Page):
     )
     page.update()
 
-ft.run(main, view=ft.AppView.WEB_BROWSER, assets_dir="assets")
+# This is the critical line for Fly.io - must bind to 0.0.0.0
+if __name__ == "__main__":
+    ft.app(target=main, host="0.0.0.0", port=8000)

@@ -5,7 +5,7 @@ import webbrowser
 # ── YOUR EXACT COLORS ─────────────────────────────────────────────────────────
 GLASS_BG = "#C4B8B8"
 GLASS_BLUR = ft.Blur(96, 96)
-TEXT_PRIMARY = "#69280A"
+TEXT_PRIMARY = "#832900"
 TEXT_SECONDARY = "#533535"
 ACCENT_CYAN = "#3d3d3b"
 ACCENT_CORAL = "#350707"

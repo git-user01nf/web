@@ -9,7 +9,7 @@ BLOG_BG = "#1a1a2e"
 
 TEXT_PRIMARY = "#ffffff"
 TEXT_SECONDARY = "#c0c8e0"
-TEXT_MUTED = "#8080a0"
+TEXT_MUTED = "#3f3fad"
 
 ACCENT_PRIMARY = "#00d4ff"
 ACCENT_SECONDARY = "#7c3aed"
@@ -24,8 +24,8 @@ CARD_BORDER = "#2a2a4a"
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets")
 SCREENSHOTS_DIR = os.path.join(ASSETS_DIR, "screenshots")
 
-# Google Drive link for video
-GOOGLE_DRIVE_LINK = "https://drive.google.com/file/d/1w4bgCcfBxDmOTmyU6mVbLCZeUZJupzhd/view?usp=drivesdk"
+# Google Drive link for video (NEW LINK)
+GOOGLE_DRIVE_LINK = "https://drive.google.com/file/d/1w2MyQiLoqyGslYFWv9syljxEHR0P3oC7/view?usp=drivesdk"
 
 class BlogPage:
     def __init__(self):
@@ -35,7 +35,15 @@ class BlogPage:
         if os.path.exists(file_path):
             webbrowser.open(f"file://{file_path}")
         else:
-            page.show_snack_bar(ft.SnackBar(content=ft.Text(f"File not found: {file_name}"), open=True))
+            # Use AlertDialog instead of snackbar
+            dlg = ft.AlertDialog(
+                title=ft.Text("File Not Found", color=ACCENT_DANGER),
+                content=ft.Text(f"File not found: {file_name}", color=TEXT_SECONDARY),
+                actions=[ft.TextButton("OK", on_click=lambda _: setattr(dlg, 'open', False) or page.update())],
+            )
+            page.dialog = dlg
+            dlg.open = True
+            page.update()
 
     def _open_drive_link(self, page):
         webbrowser.open(GOOGLE_DRIVE_LINK)
@@ -75,7 +83,11 @@ class BlogPage:
                 pass
         
         def on_click(e):
-            self._open_file(file_path, file_name, e.page)
+            # For video files, redirect to Google Drive link
+            if is_video:
+                self._open_drive_link(e.page)
+            else:
+                self._open_file(file_path, file_name, e.page)
         
         # Build card content with CENTERED text
         card_content = ft.Column([
@@ -92,58 +104,28 @@ class BlogPage:
             ),
         ], spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
         
+        # For video cards, add a clear "Follow link to watch video" button
+        if is_video:
+            card_content.controls.append(
+                ft.Container(
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.LINK, size=14, color=ACCENT_WARNING),
+                        ft.Text("🔗 FOLLOW LINK TO WATCH VIDEO", size=11, color=ACCENT_WARNING, weight=ft.FontWeight.W_700),
+                    ], spacing=6, alignment=ft.MainAxisAlignment.CENTER),
+                    on_click=lambda e: self._open_drive_link(e.page),
+                    margin=ft.Margin(0, 8, 0, 0),
+                    padding=ft.Padding(8, 6, 8, 6),
+                    bgcolor=ft.Colors.with_opacity(0.2, ACCENT_WARNING),
+                    border_radius=20,
+                )
+            )
+        
         return ft.Container(
             content=card_content,
             bgcolor=CARD_BG,
             border_radius=20,
             padding=16,
             border=ft.Border.all(1, CARD_BORDER),
-            on_click=on_click,
-        )
-
-    def _build_video_card(self):
-        """Dedicated video card for Google Drive link"""
-        accent_color = ACCENT_DANGER
-        
-        # Video preview container
-        preview_container = ft.Container(
-            content=ft.Column([
-                ft.Icon(ft.Icons.PLAY_CIRCLE_FILLED, size=64, color=accent_color),
-                ft.Text("CLICK TO WATCH VIDEO", size=14, color=accent_color, weight=ft.FontWeight.W_800, text_align=ft.TextAlign.CENTER),
-                ft.Text("Project Demo Video", size=11, color=TEXT_SECONDARY, text_align=ft.TextAlign.CENTER),
-            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=12),
-            width=300,
-            height=180,
-            bgcolor=ft.Colors.with_opacity(0.2, accent_color),
-            border_radius=16,
-            border=ft.Border.all(2, accent_color),
-        )
-        
-        def on_click(e):
-            self._open_drive_link(e.page)
-        
-        # Build card content
-        card_content = ft.Column([
-            preview_container,
-            ft.Text("📹 Project Demo Video", size=16, weight=ft.FontWeight.W_700, color=ACCENT_PRIMARY, text_align=ft.TextAlign.CENTER),
-            ft.Text("Click to watch on Google Drive", size=11, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER),
-            ft.Container(
-                content=ft.Row([
-                    ft.Icon(ft.Icons.PLAY_ARROW, size=14, color=accent_color),
-                    ft.Text("PLAY NOW", size=12, color=accent_color, weight=ft.FontWeight.W_700),
-                ], spacing=6, alignment=ft.MainAxisAlignment.CENTER),
-                bgcolor=ft.Colors.with_opacity(0.15, accent_color),
-                border_radius=20,
-                padding=ft.Padding(16, 8, 16, 8),
-            ),
-        ], spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
-        
-        return ft.Container(
-            content=card_content,
-            bgcolor=CARD_BG,
-            border_radius=20,
-            padding=20,
-            border=ft.Border.all(2, accent_color),
             on_click=on_click,
         )
 
@@ -191,43 +173,11 @@ class BlogPage:
             margin=ft.Margin(0, 0, 0, 24),
         )
         
-        # Blog posts section (FIRST)
-        blog_grid = ft.GridView(expand=True, max_extent=360, child_aspect_ratio=1.2, spacing=20, run_spacing=20)
-        
-        blog_posts = [
-            ("SRS – 25 Pages of Engineering Logic", "25.04.2126", 
-             "How I structured functional requirements, Firebase collections, and use case diagrams.",
-             ["#documentation", "#srs", "#planning"]),
-            ("Figma Prototyping in Hyperspeed", "30.05.2126", 
-             "Coordinated 8‑screen prototype, design rationale, and export for GitHub.",
-             ["#figma", "#ui/ux", "#designsystem"]),
-            ("GitHub Pull Request Workflow", "10.06.2126", 
-             "How we enforced code reviews and branch protection.",
-             ["#git", "#collaboration", "#codequality"]),
-            ("Final Presentation – Live Demo", "13.06.2126", 
-             "Prepared the live demo script, user manual, and final APK submission.",
-             ["#presentation", "#deployment", "#leadership"]),
-            ("Firebase Data Model Design", "15.04.2126", 
-             "Designing Firestore collections for users, reports, likes, and comments.",
-             ["#firebase", "#database", "#backend"]),
-            ("VS Code Development Environment", "10.03.2126", 
-             "Setting up the development environment with VS Code and ESLint.",
-             ["#vscode", "#tools", "#development"]),
-        ]
-        
-        for title, date, summary, tags in blog_posts:
-            blog_grid.controls.append(self._build_blog_card(title, date, summary, tags))
-        
-        blog_section = ft.Column([
-            ft.Text("📝 BLOG POSTS", size=18, weight=ft.FontWeight.W_700, color=ACCENT_SECONDARY, text_align=ft.TextAlign.CENTER),
-            ft.Text("Click any card to read the full article", size=12, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER),
-            blog_grid,
-        ], spacing=16, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
-        
-        # Screenshots section (SECOND)
+        # Screenshots section
         screenshots_grid = ft.GridView(expand=True, max_extent=340, child_aspect_ratio=1.1, spacing=20, run_spacing=20)
         
         screenshot_files = [
+            ("portfolio_video.mp4", "🎬 Project Demo Video"),
             ("commits history 2.png", "📊 GitHub Commits - Part 2"),
             ("commits history.png", "📈 GitHub Commits History"),
             ("commits.png", "💾 Commit Records"),
@@ -243,60 +193,77 @@ class BlogPage:
             screenshots_grid.controls.append(card)
         
         screenshots_section = ft.Column([
-            ft.Text("📸 SCREENSHOTS & MEDIA", size=18, weight=ft.FontWeight.W_700, color=ACCENT_PRIMARY, text_align=ft.TextAlign.CENTER),
-            ft.Text("Click any card to view image", size=12, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER),
+            ft.Text("📸 SCREENSHOTS & MEDIA", size=18, weight=ft.FontWeight.W_700, color=ACCENT_SECONDARY, text_align=ft.TextAlign.CENTER),
+            ft.Text("Click any card to view image or watch video", size=12, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER),
             screenshots_grid,
         ], spacing=16, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
         
-        # Video section (THIRD/LAST)
-        video_section = ft.Column([
-            ft.Text("🎬 PROJECT DEMO VIDEO", size=18, weight=ft.FontWeight.W_700, color=ACCENT_DANGER, text_align=ft.TextAlign.CENTER),
-            ft.Text("Click the card below to watch the project demonstration", size=12, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER),
-            ft.Container(content=self._build_video_card()),
-        ], spacing=12, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+        # Blog posts section
+        blog_grid = ft.GridView(expand=True, max_extent=360, child_aspect_ratio=1.2, spacing=20, run_spacing=20)
         
-        # Create containers for each section
-        blog_container_obj = ft.Container(content=blog_section, visible=True, expand=True)
-        screenshots_container_obj = ft.Container(content=screenshots_section, visible=False, expand=True)
-        video_container_obj = ft.Container(content=video_section, visible=False, expand=True)
+        blog_posts = [
+            ("SRS – 25 Pages of Engineering Logic", "25.04.2026", 
+             "How I structured functional requirements, Firebase collections, and use case diagrams.",
+             ["#documentation", "#srs", "#planning"]),
+            ("Figma Prototyping in Hyperspeed", "30.05.2026", 
+             "Coordinated 8‑screen prototype, design rationale, and export for GitHub.",
+             ["#figma", "#ui/ux", "#designsystem"]),
+            ("GitHub Pull Request Workflow", "10.06.2026", 
+             "How we enforced code reviews and branch protection.",
+             ["#git", "#collaboration", "#codequality"]),
+            ("Final Presentation – Live Demo", "13.06.2026", 
+             "Prepared the live demo script, user manual, and final APK submission.",
+             ["#presentation", "#deployment", "#leadership"]),
+            ("Firebase Data Model Design", "15.04.2026", 
+             "Designing Firestore collections for users, reports, likes, and comments.",
+             ["#firebase", "#database", "#backend"]),
+            ("VS Code Development Environment", "10.03.2026", 
+             "Setting up the development environment with VS Code and ESLint.",
+             ["#vscode", "#tools", "#development"]),
+        ]
         
-        # Create toggle buttons (BLOG first, then SCREENSHOTS, then VIDEO last)
-        blog_btn = ft.ElevatedButton(
-            content=ft.Text("📝 BLOG POSTS", size=13, color=ACCENT_SECONDARY, weight=ft.FontWeight.W_600),
-            on_click=lambda e: toggle_view("blog"),
-            bgcolor=ft.Colors.with_opacity(0.15, ACCENT_SECONDARY),
-        )
-        screenshots_btn = ft.ElevatedButton(
-            content=ft.Text("📸 SCREENSHOTS", size=13, color=ACCENT_PRIMARY, weight=ft.FontWeight.W_600),
-            on_click=lambda e: toggle_view("screenshots"),
-            bgcolor=ft.Colors.with_opacity(0.1, ACCENT_PRIMARY),
-        )
-        video_btn = ft.ElevatedButton(
-            content=ft.Text("🎬 VIDEO", size=13, color=ACCENT_DANGER, weight=ft.FontWeight.W_600),
-            on_click=lambda e: toggle_view("video"),
-            bgcolor=ft.Colors.with_opacity(0.15, ACCENT_DANGER),
-        )
+        for title, date, summary, tags in blog_posts:
+            blog_grid.controls.append(self._build_blog_card(title, date, summary, tags))
         
-        toggle_buttons = ft.Row(
-            [blog_btn, screenshots_btn, video_btn],
-            alignment=ft.MainAxisAlignment.CENTER,
-            spacing=12,
-        )
+        blog_section = ft.Column([
+            ft.Text("📝 BLOG POSTS", size=18, weight=ft.FontWeight.W_700, color=ACCENT_SECONDARY, text_align=ft.TextAlign.CENTER),
+            ft.Text("Click any card to read the full article", size=12, color=TEXT_MUTED, text_align=ft.TextAlign.CENTER),
+            blog_grid,
+        ], spacing=16, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
         
-        def toggle_view(view):
-            blog_container_obj.visible = (view == "blog")
-            screenshots_container_obj.visible = (view == "screenshots")
-            video_container_obj.visible = (view == "video")
+        # Tab view toggle
+        screenshots_container = ft.Container(content=screenshots_section, visible=True, expand=True)
+        blog_container = ft.Container(content=blog_section, visible=False, expand=True)
+        
+        def show_screenshots(e):
+            screenshots_container.visible = True
+            blog_container.visible = False
+            toggle_btn.content.value = "📝 BLOG POSTS"
             page.update()
         
+        def show_blog(e):
+            screenshots_container.visible = False
+            blog_container.visible = True
+            toggle_btn.content.value = "📸 SCREENSHOTS"
+            page.update()
+        
+        toggle_btn = ft.ElevatedButton(
+            content=ft.Text("📝 BLOG POSTS", size=14, color=ACCENT_PRIMARY, weight=ft.FontWeight.W_600),
+            on_click=show_blog,
+            bgcolor=ft.Colors.with_opacity(0.1, ACCENT_PRIMARY),
+        )
+        
+        toggle_row = ft.Row([toggle_btn], alignment=ft.MainAxisAlignment.CENTER)
+        
         content_stack = ft.Column(
-            controls=[blog_container_obj, screenshots_container_obj, video_container_obj],
+            controls=[screenshots_container, blog_container],
             expand=True,
         )
         
         return ft.Column(
-            [hero, toggle_buttons, ft.Divider(height=20, color="transparent"), content_stack],
+            [hero, toggle_row, ft.Divider(height=20, color="transparent"), content_stack],
             spacing=20,
             expand=True,
             scroll=ft.ScrollMode.AUTO,
         )
+        
