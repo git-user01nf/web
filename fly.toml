@@ -1,21 +1,29 @@
-import flet as ft
-import sys
-import os
+app = "portfolio"
 
-# Add current directory to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+[build]
+  dockerfile = "Dockerfile"
 
-print("Current directory:", os.getcwd())
-print("Files in directory:", os.listdir())
+[env]
+  PORT = "8080"
 
-try:
-    from main import main
-    print("Successfully imported main")
-except Exception as e:
-    print(f"Import error: {e}")
-    def main(page: ft.Page):
-        page.add(ft.Text(f"Error: {e}", size=20, color="red"))
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
 
-if __name__ == "__main__":
-    print("Starting server on port 8080...")
-    ft.app(target=main, host="0.0.0.0", port=8080)
+  [[services.ports]]
+    port = 80
+
+  [[services.ports]]
+    port = 443
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "30s"
+    restart_limit = 0
+    port = 8080

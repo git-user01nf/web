@@ -189,4 +189,5 @@ def main(page: ft.Page):
     )
     page.update()
 
-ft.run(main, view=ft.AppView.WEB_BROWSER, assets_dir="assets")
+if __name__ == "__main__":
+    ft.run(main, view=ft.AppView.WEB_BROWSER, assets_dir="assets")

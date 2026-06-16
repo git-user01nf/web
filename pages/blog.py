@@ -1,6 +1,6 @@
 import flet as ft
 import os
-import webbrowser
+import urllib.parse
 
 # ── NEW MODERN COLOR SCHEME ──────────────────────────────────────────────────
 BG_DARK = "#0a0a0f"
@@ -33,9 +33,8 @@ class BlogPage:
 
     def _open_file(self, file_path, file_name, page):
         if os.path.exists(file_path):
-            webbrowser.open(f"file://{file_path}")
+            page.launch_url(f"/assets/screenshots/{urllib.parse.quote(file_name)}")
         else:
-            # Use AlertDialog instead of snackbar
             dlg = ft.AlertDialog(
                 title=ft.Text("File Not Found", color=ACCENT_DANGER),
                 content=ft.Text(f"File not found: {file_name}", color=TEXT_SECONDARY),
@@ -46,7 +45,7 @@ class BlogPage:
             page.update()
 
     def _open_drive_link(self, page):
-        webbrowser.open(GOOGLE_DRIVE_LINK)
+        page.launch_url(GOOGLE_DRIVE_LINK)
 
     def _build_screenshot_card(self, file_name, display_name):
         file_path = os.path.join(SCREENSHOTS_DIR, file_name)
@@ -78,14 +77,22 @@ class BlogPage:
         # Load image preview if it's an image file
         if not is_video and os.path.exists(file_path) and file_name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
             try:
-                preview_container = ft.Image(src=file_path, width=300, height=180, fit="contain", border_radius=16)
+                preview_container = ft.Image(
+                    src=f"/assets/screenshots/{urllib.parse.quote(file_name)}",
+                    width=300,
+                    height=180,
+                    fit="contain",
+                    border_radius=16,
+                )
             except:
                 pass
         
         def on_click(e):
-            # For video files, redirect to Google Drive link
             if is_video:
-                self._open_drive_link(e.page)
+                if os.path.exists(file_path):
+                    e.page.launch_url(f"/assets/screenshots/{urllib.parse.quote(file_name)}")
+                else:
+                    self._open_drive_link(e.page)
             else:
                 self._open_file(file_path, file_name, e.page)
         
@@ -177,7 +184,7 @@ class BlogPage:
         screenshots_grid = ft.GridView(expand=True, max_extent=340, child_aspect_ratio=1.1, spacing=20, run_spacing=20)
         
         screenshot_files = [
-            ("portfolio_video.mp4", "🎬 Project Demo Video"),
+            ("Click to watch video.mp4", "🎬 Project Demo Video"),
             ("commits history 2.png", "📊 GitHub Commits - Part 2"),
             ("commits history.png", "📈 GitHub Commits History"),
             ("commits.png", "💾 Commit Records"),

@@ -1,6 +1,6 @@
 import flet as ft
 import os
-import webbrowser
+import urllib.parse
 
 # ── YOUR EXACT COLORS ─────────────────────────────────────────────────────────
 GLASS_BG = "#C4B8B8"
@@ -21,7 +21,7 @@ class MatlabPage:
 
     def _open_file(self, file_path, file_name, page):
         if os.path.exists(file_path):
-            webbrowser.open(f"file://{file_path}")
+            page.launch_url(f"/assets/certificates/{urllib.parse.quote(file_name)}")
         else:
             page.show_snack_bar(ft.SnackBar(content=ft.Text(f"File not found: {file_name}"), open=True))
 
@@ -55,7 +55,13 @@ class MatlabPage:
         # Load image preview if it's an image file
         if is_image and os.path.exists(file_path):
             try:
-                preview_container = ft.Image(src=file_path, width=300, height=180, fit="contain", border_radius=16)
+                preview_container = ft.Image(
+                    src=f"/assets/certificates/{urllib.parse.quote(file_name)}",
+                    width=300,
+                    height=180,
+                    fit="contain",
+                    border_radius=16,
+                )
             except:
                 pass
         

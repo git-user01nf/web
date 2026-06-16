@@ -1,5 +1,4 @@
 import flet as ft
-import webbrowser
 
 # ── GLASS DARK THEME ─────────────────────────────────────────────────────────
 GLASS_BG = "#0a0f1a"
@@ -62,7 +61,7 @@ class GithubPage:
     ]
 
     def _open_link(self, url, page):
-        webbrowser.open(url)
+        page.launch_url(url)
 
     def _build_link_card(self, title, link_data):
         """Build a futuristic glass card for each project link"""
